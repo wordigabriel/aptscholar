@@ -22,6 +22,7 @@ import StatsGrid from "./components/StatsGrid";
 import Scanner from "./components/Scanner";
 import DocUploader from "./components/DocUploader";
 import HistoryList from "./components/HistoryList";
+import AppLogo from "./components/AppLogo";
 import { SolvedQuestion, ViewState } from "./types";
 
 export default function App() {
@@ -189,12 +190,12 @@ export default function App() {
       {view === "splash" ? (
         /* ==================== SPLASH SCREEN PORTAL ==================== */
         <div className="flex-1 flex flex-col items-center justify-center p-6 text-center z-10 relative">
-          <div className="w-20 h-20 rounded-full border border-neon-green/40 flex items-center justify-center mb-6 animate-pulse-green relative">
-            <Command className="w-10 h-10 text-neon-green" />
-            <div className="absolute inset-0 border-2 border-dashed border-neon-green rounded-full animate-spin [animation-duration:15s]"></div>
+          <div className="relative mb-6">
+            <AppLogo variant="icon" size="xl" showText={false} className="animate-pulse-green" />
+            <div className="absolute inset-x-0 -bottom-2 -top-2 border-2 border-dashed border-neon-green/30 rounded-3xl animate-spin [animation-duration:25s] pointer-events-none scale-110"></div>
           </div>
 
-          <h1 className="text-4xl md:text-6xl font-display font-black tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-neutral-100 to-gray-500 uppercase">
+          <h1 className="text-4xl md:text-6xl font-display font-black tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-neutral-100 to-gray-200 uppercase">
             APT<span className="text-neon-green font-mono">Scholar</span>
           </h1>
 
@@ -226,15 +227,13 @@ export default function App() {
           {/* Header Bar */}
           <header className="sticky top-0 z-40 bg-black/85 border-b border-gray-900/80 backdrop-blur-md px-4 py-4 md:px-8 flex items-center justify-between">
             <div className="flex items-center space-x-3 cursor-pointer" onClick={() => setView("splash")}>
-              <div className="w-8 h-8 rounded-lg bg-neon-green/10 border border-neon-green/30 flex items-center justify-center">
-                <Command className="w-4.5 h-4.5 text-neon-green" />
-              </div>
+              <AppLogo variant="icon" size="sm" showText={false} />
               <div>
                 <span className="font-display font-black text-white hover:text-neon-green transition text-base tracking-tight uppercase">
                   APTS<span className="text-neon-green">Scholar</span>
                 </span>
-                <span className="text-[8px] text-gray-500 ml-2 uppercase font-mono tracking-wider hidden sm:inline-block">
-                  AI EXAM SOLVER [v1.4]
+                <span className="text-[8px] text-gray-500 ml-2 uppercase font-mono tracking-wider hidden sm:inline-block font-bold">
+                  STUDY SMART [v1.4]
                 </span>
               </div>
             </div>

@@ -69,8 +69,20 @@ export default function Scanner({ onSolved, onClose }: ScannerProps) {
       setLoading(true);
       addLog("SNAP: Freezing frame buffer...");
       
-      const width = videoRef.current.videoWidth || 640;
-      const height = videoRef.current.videoHeight || 480;
+      let width = videoRef.current.videoWidth || 640;
+      let height = videoRef.current.videoHeight || 480;
+
+      // Scale down image to a maximum dimension of 1024px to dramatically reduce upload size and processing latency
+      const MAX_DIMENSION = 1024;
+      if (width > MAX_DIMENSION || height > MAX_DIMENSION) {
+        if (width > height) {
+          height = Math.round((height * MAX_DIMENSION) / width);
+          width = MAX_DIMENSION;
+        } else {
+          width = Math.round((width * MAX_DIMENSION) / height);
+          height = MAX_DIMENSION;
+        }
+      }
 
       const canvas = document.createElement("canvas");
       canvas.width = width;
@@ -89,7 +101,8 @@ export default function Scanner({ onSolved, onClose }: ScannerProps) {
         ctx.drawImage(videoRef.current, 0, 0, width, height);
       }
 
-      const base64Image = canvas.toDataURL("image/png");
+      // Convert to compressed jpeg in order to keep payloads tiny and speed up uploads
+      const base64Image = canvas.toDataURL("image/jpeg", 0.82);
       addLog("SERVER: Dispatching base64 stream to APTScholar Brain...");
 
       const response = await fetch("/api/solve", {
@@ -97,7 +110,7 @@ export default function Scanner({ onSolved, onClose }: ScannerProps) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           image: base64Image,
-          mimeType: "image/png"
+          mimeType: "image/jpeg"
         })
       });
 

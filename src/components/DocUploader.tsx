@@ -91,7 +91,47 @@ export default function DocUploader({ onSolved }: DocUploaderProps) {
       // Read file into Base64 format
       const reader = new FileReader();
       reader.onload = async () => {
-        const base64String = reader.result as string;
+        let base64String = reader.result as string;
+        let finalMimeType = file.type || (isDocx ? "application/vnd.openxmlformats-officedocument.wordprocessingml.document" : "text/plain");
+
+        // Optimize and compress client-side images (PNG/JPEG) to dramatically increase speed and decrease latency
+        if (file.type && file.type.startsWith("image/")) {
+          try {
+            base64String = await new Promise<string>((resolve) => {
+              const img = new Image();
+              img.onload = () => {
+                let width = img.width;
+                let height = img.height;
+                const MAX_DIMENSION = 1024;
+                if (width > MAX_DIMENSION || height > MAX_DIMENSION) {
+                  if (width > height) {
+                    height = Math.round((height * MAX_DIMENSION) / width);
+                    width = MAX_DIMENSION;
+                  } else {
+                    width = Math.round((width * MAX_DIMENSION) / height);
+                    height = MAX_DIMENSION;
+                  }
+                }
+
+                const canvas = document.createElement("canvas");
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext("2d");
+                if (ctx) {
+                  ctx.drawImage(img, 0, 0, width, height);
+                  resolve(canvas.toDataURL("image/jpeg", 0.82));
+                } else {
+                  resolve(reader.result as string);
+                }
+              };
+              img.onerror = () => resolve(reader.result as string);
+              img.src = reader.result as string;
+            });
+            finalMimeType = "image/jpeg";
+          } catch (compressErr) {
+            console.warn("Client-side compression skipped:", compressErr);
+          }
+        }
         
         // Post to express backend
         const response = await fetch("/api/solve", {
@@ -99,7 +139,7 @@ export default function DocUploader({ onSolved }: DocUploaderProps) {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             fileData: base64String,
-            mimeType: file.type || (isDocx ? "application/vnd.openxmlformats-officedocument.wordprocessingml.document" : "text/plain")
+            mimeType: finalMimeType
           })
         });
 

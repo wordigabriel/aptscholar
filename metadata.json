@@ -1,0 +1,10 @@
+{
+  "name": "APTScholar",
+  "description": "Futuristic AI-powered exam and quiz-solving assistant optimized for instant answers, OCR scanning, and document resolution.",
+  "requestFramePermissions": [
+    "camera"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
